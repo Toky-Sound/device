@@ -84,12 +84,20 @@
     const form = document.getElementById('healthForm');
     const recordsList = document.getElementById('records');
 
-    // 從 localStorage 中載入數據
+    // 在 window.onload 中添加的程式碼
     window.onload = function() {
-        const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
-        savedData.forEach((item, index) => {
-            addListItem(item, index);
-        });
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.has('data')) {
+            const savedData = JSON.parse(decodeURIComponent(queryParams.get('data')));
+            savedData.forEach((item, index) => {
+                addListItem(item, index);
+            });
+        } else {
+            const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+            savedData.forEach((item, index) => {
+                addListItem(item, index);
+            });
+        }
     };
 
     form.addEventListener('submit', function(event) {
@@ -114,6 +122,10 @@
         // 添加到列表
         addListItem(newData, savedData.length - 1);
 
+        // 更新 URL
+        const encodedData = encodeURIComponent(JSON.stringify(savedData));
+        window.history.replaceState({}, '', `?data=${encodedData}`);
+
         form.reset();
     });
 
@@ -136,6 +148,10 @@
         savedData.forEach((item, newIndex) => {
             addListItem(item, newIndex);
         });
+
+        // 更新 URL
+        const encodedData = encodeURIComponent(JSON.stringify(savedData));
+        window.history.replaceState({}, '', `?data=${encodedData}`);
     }
 
     // 下載 Excel 檔案
@@ -168,5 +184,4 @@
 
 </body>
 </html>
-
 
