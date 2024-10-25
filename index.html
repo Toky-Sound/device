@@ -72,12 +72,9 @@
     <ul id="records"></ul>
 </div>
 
-<button id="downloadBtn">下載為 Excel (CSV)</button>
-
 <script>
     const form = document.getElementById('healthForm');
     const recordsList = document.getElementById('records');
-    const downloadBtn = document.getElementById('downloadBtn');
 
     // 從 localStorage 中載入數據
     window.onload = function() {
@@ -130,26 +127,6 @@
             addListItem(item, newIndex);
         });
     }
-
-    // 生成 CSV 並下載
-    downloadBtn.addEventListener('click', () => {
-        let savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
-        let csvContent = "data:text/csv;charset=utf-8," + 
-                         "血壓 (mmHg), 血氧 (%), 體脂肪 (%), 時間\n";
-
-        savedData.forEach(item => {
-            const row = `${item.bloodPressure}, ${item.bloodOxygen}, ${item.bodyFat}, ${item.timestamp}`;
-            csvContent += row + "\n";
-        });
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "health_data.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
 </script>
 
 </body>
