@@ -1,0 +1,35 @@
+name: Update Excel on Data Change
+
+on:
+  push:
+    paths:
+      - 'data.json'  # 當 data.json 檔案有變動時觸發
+
+jobs:
+  update-excel:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        pip install openpyxl
+
+    - name: Update Excel file
+      run: |
+        python update_excel.py
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.name "GitHub Action"
+        git config --local user.email "action@github.com"
+        git add health_data.xlsx
+        git commit -m "自動更新 Excel 檔案"
+        git push
