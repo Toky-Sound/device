@@ -64,6 +64,12 @@
     <label for="bodyFat">體脂肪 (%):</label>
     <input type="number" id="bodyFat" min="0" max="100" required>
 
+    <label for="bmi">BMI:</label>
+    <input type="number" id="bmi" step="0.1" required>
+
+    <label for="heartRate">心律 (bpm):</label>
+    <input type="number" id="heartRate" min="0" required>
+
     <button type="submit">記錄</button>
 </form>
 
@@ -90,11 +96,13 @@
         const bloodPressure = document.getElementById('bloodPressure').value;
         const bloodOxygen = document.getElementById('bloodOxygen').value;
         const bodyFat = document.getElementById('bodyFat').value;
+        const bmi = document.getElementById('bmi').value;
+        const heartRate = document.getElementById('heartRate').value;
 
         // 獲取當前時間
         const timestamp = new Date().toLocaleString('zh-Hant', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-        const newData = { bloodPressure, bloodOxygen, bodyFat, timestamp };
+        const newData = { bloodPressure, bloodOxygen, bodyFat, bmi, heartRate, timestamp };
 
         // 儲存到 localStorage
         const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
@@ -110,7 +118,7 @@
     // 添加列表項目
     function addListItem(item, index) {
         const listItem = document.createElement('li');
-        listItem.innerHTML = `血壓: ${item.bloodPressure} mmHg, 血氧: ${item.bloodOxygen} %, 體脂肪: ${item.bodyFat} %, 時間: ${item.timestamp} 
+        listItem.innerHTML = `血壓: ${item.bloodPressure} mmHg, 血氧: ${item.bloodOxygen} %, 體脂肪: ${item.bodyFat} %, BMI: ${item.bmi}, 心律: ${item.heartRate} bpm, 時間: ${item.timestamp} 
                               <button class="delete-btn" onclick="deleteRecord(${index})">刪除</button>`;
         recordsList.appendChild(listItem);
     }
