@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康數據記錄</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 400px;
+        }
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .data-list {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .delete-btn {
+            margin-left: 10px;
+            padding: 5px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #ff1a1a;
+        }
+    </style>
+</head>
+<body>
+
+<h2>健康數據記錄</h2>
+
+<form id="healthForm">
+    <label for="bloodPressure">血壓 (mmHg):</label>
+    <input type="text" id="bloodPressure" required>
+
+    <label for="bloodOxygen">血氧 (%):</label>
+    <input type="number" id="bloodOxygen" min="0" max="100" required>
+
+    <label for="bodyFat">體脂肪 (%):</label>
+    <input type="number" id="bodyFat" min="0" max="100" required>
+
+    <button type="submit">記錄</button>
+</form>
+
+<div class="data-list" id="dataList">
+    <h3>記錄列表</h3>
+    <ul id="records"></ul>
+</div>
+
+<button id="downloadBtn">下載為 Excel (CSV)</button>
+
+<script>
+    const form = document.getElementById('healthForm');
+    const recordsList = document.getElementById('records');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // 從 localStorage 中載入數據
+    window.onload = function() {
+        const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+        savedData.forEach((item, index) => {
+            addListItem(item, index);
+        });
+    };
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const bloodPressure = document.getElementById('bloodPressure').value;
+        const bloodOxygen = document.getElementById('bloodOxygen').value;
+        const bodyFat = document.getElementById('bodyFat').value;
+
+        // 獲取當前時間
+        const timestamp = new Date().toLocaleString('zh-Hant', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        const newData = { bloodPressure, bloodOxygen, bodyFat, timestamp };
+
+        // 儲存到 localStorage
+        const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+        savedData.push(newData);
+        localStorage.setItem('healthRecords', JSON.stringify(savedData));
+
+        // 添加到列表
+        addListItem(newData, savedData.length - 1);
+
+        form.reset();
+    });
+
+    // 添加列表項目
+    function addListItem(item, index) {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `血壓: ${item.bloodPressure} mmHg, 血氧: ${item.bloodOxygen} %, 體脂肪: ${item.bodyFat} %, 時間: ${item.timestamp} 
+                              <button class="delete-btn" onclick="deleteRecord(${index})">刪除</button>`;
+        recordsList.appendChild(listItem);
+    }
+
+    // 刪除記錄
+    function deleteRecord(index) {
+        let savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+        savedData.splice(index, 1);  // 刪除特定索引的記錄
+        localStorage.setItem('healthRecords', JSON.stringify(savedData));
+
+        // 重新渲染列表
+        recordsList.innerHTML = '';
+        savedData.forEach((item, newIndex) => {
+            addListItem(item, newIndex);
+        });
+    }
+
+    // 生成 CSV 並下載
+    downloadBtn.addEventListener('click', () => {
+        let savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+        let csvContent = "data:text/csv;charset=utf-8," + 
+                         "血壓 (mmHg), 血氧 (%), 體脂肪 (%), 時間\n";
+
+        savedData.forEach(item => {
+            const row = `${item.bloodPressure}, ${item.bloodOxygen}, ${item.bodyFat}, ${item.timestamp}`;
+            csvContent += row + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "health_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+
+</body>
+</html>
