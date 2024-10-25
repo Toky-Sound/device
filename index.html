@@ -78,6 +78,8 @@
     <ul id="records"></ul>
 </div>
 
+<button id="downloadExcel">下載 Excel 檔案</button>
+
 <script>
     const form = document.getElementById('healthForm');
     const recordsList = document.getElementById('records');
@@ -135,6 +137,30 @@
             addListItem(item, newIndex);
         });
     }
+
+    // 下載 Excel 檔案
+    document.getElementById('downloadExcel').addEventListener('click', function() {
+        const savedData = JSON.parse(localStorage.getItem('healthRecords')) || [];
+        if (savedData.length === 0) {
+            alert("沒有數據可供下載");
+            return;
+        }
+
+        // 創建 CSV 格式的內容
+        let csvContent = "data:text/csv;charset=utf-8," 
+            + "血壓,血氧,體脂肪,BMI,心律,時間\n" 
+            + savedData.map(e => `${e.bloodPressure},${e.bloodOxygen},${e.bodyFat},${e.bmi},${e.heartRate},${e.timestamp}`).join("\n");
+
+        // 創建下載鏈接
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "健康數據記錄.csv");
+        document.body.appendChild(link); // 必須加到 DOM 中
+
+        link.click(); // 觸發下載
+        document.body.removeChild(link); // 刪除鏈接
+    });
 </script>
 
 </body>
