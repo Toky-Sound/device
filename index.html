@@ -148,6 +148,7 @@
 
         // 創建 CSV 格式的內容
         let csvContent = "data:text/csv;charset=utf-8," 
+            + "\uFEFF" // 添加 UTF-8 BOM 以支持中文顯示
             + "血壓,血氧,體脂肪,BMI,心律,時間\n" 
             + savedData.map(e => 
                 `"${e.bloodPressure}","${e.bloodOxygen}","${e.bodyFat}","${e.bmi}","${e.heartRate}","${e.timestamp}"`
@@ -167,3 +168,5 @@
 
 </body>
 </html>
+
+
